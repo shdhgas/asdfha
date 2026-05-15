@@ -1,0 +1,108 @@
+京东商品评论API接口 item_review 接入教程 想要获取京东商品评论数据，最便捷规范的方式就是接入**item_review 商品评论API接口**。只需完成账号注册、密钥获取、接口调试、代码调用几步，就能快速抓取商品评论内容、评论时间、用户等级、点赞量等核心公开数据，非常适合技术学习、电商数据分析研究使用。
+
+一、API接口接入准备
+首先需要注册京东开发者平台账号，入驻成为开发者，申请创建应用，后台申领专属 ApiKey 和 ApiSecret 身份密钥。
+同时查阅官方API文档，熟悉 item_review 接口的请求规则、请求参数、字段含义与JSON返回结构，了解商品ID、页码、排序类型、是否区分sku等入参用法，为代码调用做好基础准备。
+
+二、基础调用流程
+备好已申请的 ApiKey、ApiSecret 和目标京东商品ID；
+
+按照接口规则拼接请求地址与请求参数；
+
+使用Python发起网络请求，携带请求头合规访问接口；
+
+接收后端返回的JSON数据，解析提取评论内容、发布时间、用户信息等所需字段；
+
+可自行扩展分页采集、数据筛选、本地保存等功能。
+
+三、Python 接口请求示例代码
+# coding:utf-8
+"""
+适配 Python2.x / Python3.x
+安装依赖：pip install requests
+"""
+from __future__ import print_function
+import requests
+
+# 接口基础地址与密钥参数（自行替换为自己的有效密钥）
+url = "/jd/item_review/?key=你的Key&amp;secret=你的Secret&amp;num_iid=商品ID&amp;page=1&amp;sort=&amp;is_sku=false"
+
+headers = {
+    "Accept-Encoding": "gzip",
+    "Connection": "close",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+}
+
+if __name__ == "__main__":
+    res = requests.get(url, headers=headers, timeout=10)
+    json_data = res.json()
+    print(json_data)
+Python
+代码解读
+代码解读
+复制代码
+复制代码
+展开代码
+▼
+四、封装可复用完整版代码
+下面是封装好的通用方法，可自定义页码、每页条数，自动解析评论核心字段，直接替换密钥和商品ID即可运行：
+
+import requests
+import json
+
+def get_jd_item_reviews(app_key, app_secret, sku_id, page=1, page_size=20):
+    """
+    调用京东商品评论API
+    :param app_key: 应用Key
+    :param app_secret: 应用Secret
+    :param sku_id: 京东商品ID
+    :param page: 请求页码
+    :param page_size: 每页评论数量
+    :return: 评论JSON数据
+    """
+    api_url = "https://api.jd.com/comment"
+    params = {
+        "skuId": sku_id,
+        "page": page,
+        "pageSize": page_size,
+        "type": "all"
+    }
+    headers = {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+    }
+    response = requests.get(api_url, params=params, headers=headers, timeout=15)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"请求异常，状态码：{response.status_code}")
+        return None
+
+# 调用示例
+if __name__ == "__main__":
+    # 替换为自己的真实密钥和商品ID
+    app_key = "YOUR_APP_KEY"
+    app_secret = "YOUR_APP_SECRET"
+    sku_id = 123456789
+
+    reviews = get_jd_item_reviews(app_key, app_secret, sku_id)
+    if reviews:
+        print("商品总评论数：", reviews.get("total"))
+        print("="*60)
+        for item in reviews.get("comments", []):
+            print("评论内容：", item.get("content"))
+            print("评论时间：", item.get("createTime"))
+            print("用户等级：", item.get("userLevel"))
+            print("点赞数量：", item.get("usefulVoteCount"))
+            print("回复数量：", item.get("replyCount"))
+            print("-"*60)
+Python
+代码解读
+代码解读
+复制代码
+复制代码
+展开代码
+▼
+五、使用说明与注意事项
+使用时务必将代码里的 ApiKey、ApiSecret、商品ID 替换为自己的真实有效信息。接口可自由切换页码、调整排序规则，支持筛选全部评论、好评、中差评等类型。
+
+通过调用京东 item_review 官方API接口，搭配Python就能稳定、高效获取商品公开评论数据。适合新手学习接口调用、网络请求与JSON数据解析，也可用于个人电商数据分析、学习研究等场景。建议合理控制请求频率，遵守平台规则，仅做技术学习与非商业研究使用。tg：@some1899
