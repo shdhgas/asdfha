@@ -1,0 +1,32 @@
+如今海外短视频平台流量日益火热，不管是跨境带货、账号运营还是行业趋势分析，都离不开真实的平台流量数据。视频播放量、点赞数、评论内容、发布时间、博主热度等数据，都是研判赛道热度、布局海外市场的核心依据。
+想要人工整理这类数据效率极低，借助 Python 接口调用方式，就能快速批量获取平台公开短视频相关数据，无需复杂逆向解析，适配日常运营与数据分析使用。在实操过程中，只需配置好调用密钥，合理控制请求频次，搭配请求请求头模拟正常访问，就能稳定拿到所需公开数据，规避基础访问限制。
+日常运营中，该数据可用于竞品账号数据分析、热门选题挖掘、海外用户喜好调研、爆款视频要素整理等场景，低成本完成海外内容赛道的数据调研工作。
+下面给大家分享简易调用代码，零基础也能直接修改参数运行：
+python
+运行
+import requests
+
+# 接口基础配置
+api_key = "填写你的调用密钥"
+video_id = "目标短视频ID"
+url = f"https://api.tkdata.com/video/info?key={api_key}&vid={video_id}"
+
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+}
+
+# 发起数据请求
+res = requests.get(url,headers=headers)
+data = res.json()
+
+# 提取核心流量数据
+play = data.get("play_count")
+like = data.get("like_count")
+comment = data.get("comment_count")
+title = data.get("title")
+
+print("视频标题：",title)
+print("播放量：",play)
+print("点赞量：",like)
+print("评论数：",comment)
+运行代码后即可一键抓取视频核心流量数据，大家还可根据自身需求，拓展抓取博主主页作品列表、热门榜单、地域流量数据等内容。温馨提示，仅用于正规行业数据分析，严格遵守平台使用规则，合理调用接口，切勿高频恶意批量爬取，保障账号与接口使用稳定。tg:@some1899
