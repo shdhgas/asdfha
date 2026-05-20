@@ -1,0 +1,28 @@
+​
+1、TikTok博主视频列表
+最近TT的风控好严重，接口频繁触发拦截，比较难搞，分享基础实现思路，规避常见风控点，结合TikTok平台风控特性，适配海外地区数据采集需求。
+
+import requests
+
+url = 'http://地址/tt/earch_data_videos'
+data = {
+    "token": "h",
+    "keyword": "Pet Cat", 
+    "cursor": 0,          
+    "count": 10,         
+    "region": "US",
+    "language": "en"
+}
+
+try:
+    response = requests.get(url, params=data).json()
+    print("采集成功！视频列表：")
+    for video in response["data"]["videos"][:3]:
+        print(f"视频标题：{video['title']}，播放量：{video['views']}")
+except Exception as e:
+    print(f"采集失败，大概率是风控，稍等再试：{str(e)}")
+
+2、视频列表示例
+​
+{"status_code":0,"min_cursor":1777500646557,"max_cursor":1777327686824,"has_more":1,"aweme_list":[{"aweme_id":"7634307097114512653","desc":"Royal purple.#amethyst#ring#s925#giftformom#SummerVibes  ","create_time":1777500647,"author":{"uid":"7356434712338056238","short_id":"0","nickname":"Sanatsparkle","signature":"🎙️JoJo \u0026 Michelle 🥰\n🕰️EST:18:00-6:00\n     PST:15:00-3:00\n     Weds.--Mon.\n  💖Thx xoxo","avatar_larger":{"uri":"tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd","url_list":["https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:1080:1080.webp?dr=9640\u0026refresh_token=7686069f\u0026x-expires=1777629600\u0026x-signature=bbI9f9SSUuTtsxLs%2B7DG5H1DRCI%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=d05b14bd\u0026shcp=34ff8df6\u0026idc=useast8","https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:1080:1080.webp?dr=9640\u0026refresh_token=94b84f69\u0026x-expires=1777629600\u0026x-signature=iFnz5lwiqRiu%2F9HsbZ0oSbYoc4w%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=d05b14bd\u0026shcp=34ff8df6\u0026idc=useast8","https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:1080:1080.jpeg?dr=9640\u0026refresh_token=ae0cc561\u0026x-expires=1777629600\u0026x-signature=%2Bquoidj7CpZDaZ704p2WVWkk8Lw%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=d05b14bd\u0026shcp=34ff8df6\u0026idc=useast8"],"width":720,"height":720,"url_prefix":null},"avatar_thumb":{"uri":"tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd","url_list":["https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:100:100.webp?dr=9640\u0026refresh_token=f6d45051\u0026x-expires=1777629600\u0026x-signature=hhsNnIu1oodz8cYhPzpsw6fNsRg%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=d05b14bd\u0026shcp=34ff8df6\u0026idc=useast8","https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:100:100.webp?dr=9640\u0026refresh_token=e1384f1f\u0026x-expires=1777629600\u0026x-signature=6WdFU8Rec9puQzvrPehhZxeTQx8%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=d05b14bd\u0026shcp=34ff8df6\u0026idc=useast8","https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:100:100.jpeg?dr=9640\u0026refresh_token=deb24e0d\u0026x-expires=1777629600\u0026x-signature=GxVbUQ2aL2tKLbSPVdim0oZYERg%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=d05b14bd\u0026shcp=34ff8df6
+TG：@some1899
