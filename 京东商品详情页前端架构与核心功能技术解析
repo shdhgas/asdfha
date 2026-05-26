@@ -1,0 +1,114 @@
+京东商品详情页是典型的高复杂度电商前端页面，采用模块化拆分、异步渲染、按需加载的开发思路，解决了页面模块多、数据量大、交互复杂、加载卡顿等问题。页面整体分为静态基础模块和动态异步模块，兼顾页面稳定性与交互实时性，是电商前端工程化的典型落地案例。
+
+从页面架构来看，详情页核心分为三大模块：静态基础信息（标题、规格参数、详情图文）、动态数据模块（价格、库存、促销、配送信息）、交互功能模块（SKU选择、图片预览、加购操作）。其中动态数据均通过接口异步加载，避免大量数据阻塞首屏渲染，有效提升页面加载速度。
+
+以下是商品基础信息展示、简易SKU切换的核心精简实现代码，还原其基础渲染与交互逻辑：
+
+<!-- 商品详情核心DOM结构 -->
+<div class="goods-detail">
+  <!-- 静态基础信息 -->
+  <div class="goods-info">
+    <h2 class="goods-title">商品名称展示区域</h2>
+    <p class="goods-price" id="price-box"></p>
+    <div class="sku-list" id="skuList"></div>
+  </div>
+  <!-- 详情图文模块 -->
+  <div class="goods-desc">商品参数与详情介绍</div>
+</div>
+ 
+<script>
+// 模拟异步获取商品动态数据
+async function getGoodsData(){
+  const res = await fetch('/api/goods/detail');
+  return res.json();
+}
+// 初始化页面数据
+async function initDetail(){
+  const data = await getGoodsData();
+  document.getElementById('price-box').innerText = `¥${data.price}`;
+  // 渲染SKU规格选项
+  data.skuList.forEach(item => {
+    document.getElementById('skuList').innerHTML += `<span class="sku-item">${item.name}</span>`;
+  });
+}
+initDetail();
+</script>
+一键获取完整项目代码
+html
+
+性能优化方面，京东详情页采用图片懒加载、模块按需渲染、接口数据缓存等方案。非首屏的详情图文、用户评价、售后模块延迟加载，高频变动的价格、库存数据单独接口轮询更新，避免全局刷新。同时借助Flex、Grid布局实现全端自适应，保障PC、移动端的展示一致性。
+
+整体而言，该页面通过动静分离的架构设计，平衡了丰富功能与加载性能，其模块化、异步化的开发思路，适配了大型电商页面的业务场景，具备较高的前端学习参考价值。@some1899 
+
+商品详情示例：
+
+  {
+                    "blackCardUserUrl": "//img.alicdn.com/tfs/TB1wrG1elv0gK0jSZKbXXbK2FXa-225-96.png",
+                    "content": "和之前的不一样 不是一个版型的 ",
+                    "createTimeInterval": "3周前",
+                    "dateTime": "2025-11-20",
+                    "feedId": "1289959177170",
+                    "headPic": "//img.alicdn.com/imgextra/i4/O1CN01GbZNxl26Vzotrjqli_!!6000000007668-2-tps-160-160.png",
+                    "isVip": "true",
+                    "memberLevel": "8",
+                    "skuInfo": "颜色:254黑色[裤子];尺码:XL[145-160斤]",
+                    "tmallMemberLevel": "0",
+                    "userName": "匿名买家"
+                },
+                {
+                    "content": "满意",
+                    "createTimeInterval": "1年前",
+                    "dateTime": "2024-04-20",
+                    "feedId": "1236656925715",
+                    "headPic": "//img.alicdn.com/imgextra/i4/O1CN01GbZNxl26Vzotrjqli_!!6000000007668-2-tps-160-160.png",
+                    "isVip": "true",
+                    "memberLevel": "8",
+                    "skuInfo": "颜色:白色[衬衫];尺码:XL[145-160斤]",
+                    "tmallMemberLevel": "4",
+                    "userName": "匿名买家"
+                }
+            ],
+            "totalCount": "22",
+            "utFeedId": "1289959177170_1236656925715"
+        },
+        "resource": {
+            "entrances": {
+                "askAll": {
+                    "icon": "https://img.alicdn.com/tps/TB1tVU6PpXXXXXFaXXXXXXXXXXX-102-60.png",
+                    "link": "https://meta.m.taobao.com/app/mtb/taobao-ugc/ask/list?disableNav=YES&refId=707325316093",
+                    "text": "对宝贝有疑问？可以向已买的人求助"
+                }
+            }
+        },
+        "seller": {
+            "allItemCount": "216",
+            "atmophereMask": "true",
+            "atmosphereColor": "#ffffff",
+            "atmosphereImg": "https://img.alicdn.com/imgextra/i1/4154522680/O1CN01MJ631p1VfURMSTkN3_!!4154522680.jpg",
+            "atmosphereMaskColor": "#59000000",
+            "backgroundPic": "https://img.alicdn.com/imgextra/i3/O1CN01xTAR63288IdQsnpY9_!!6000000007887-0-tps-750-750.jpg",
+            "brandIcon": "//gw.alicdn.com/tfs/TB1bzHljfb2gK0jSZK9XXaEgFXa-368-52.png?getAvatar=avatar",
+            "brandIconRatio": "7.3",
+            "creditLevel": "12",
+            "creditLevelIcon": "//gw.alicdn.com/imgextra/i1/O1CN01VD9Iap25oweneR31D_!!6000000007574-2-tps-120-60.png",
+            "dataTypeLabels": [
+                {
+                    "labelCode": "threshold_repurchase_cnt_1y",
+                    "outputName": "一年回头客3千",
+                    "processedValue": "3千"
+                },
+                {
+                    "labelCode": "threshold_pay_ord_itm_qty_1m",
+                    "outputName": "月销超4千件宝贝",
+                    "processedValue": "4千"
+                },
+                {
+                    "labelCode": "threshold_shop_open_year_1",
+                    "outputName": "7年老店",
+                    "processedValue": "7"
+                },
+                {
+                    "labelCode": "threshold_itm_clt_cnt_1y",
+                    "outputName": "超3万人收藏",
+                    "processedValue": "3万"
+                },
