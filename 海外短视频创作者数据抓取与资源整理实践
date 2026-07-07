@@ -1,0 +1,161 @@
+做跨境内容运营、海外新媒体运营的朋友，大概率都会遇到同一个痛点：想要精准匹配优质创作者合作，却没有高效的资源筛选渠道。平台自带的推荐列表杂乱无章，第三方工具数据滞后且付费成本极高，手动统计达人信息耗时费力，很难快速筛选出垂直领域、高性价比的优质创作者资源。
+深耕海外内容运营多年，我整理了一套轻量化的数据爬取与整理方案，无需复杂部署，适配主流海外短视频平台，能够快速抓取创作者核心维度数据，批量整理达人资源，完全适配个人开发者和小型运营团队使用，规避了商用工具的高额成本，实用性拉满。
+这套方案核心是通过公开接口请求，抓取创作者主页的公开数据，包含粉丝体量、作品互动率、内容垂类 、更新频率等关键运营维度，全程合规抓取公开信息，无违规爬取、无隐私窃取，完全符合国内技术社区发布规范，可放心落地使用。
+下面分享可直接运行的完整代码，基于Python编写，依赖基础库，新手也能快速上手，代码精简无冗余，可根据自身需求自定义筛选规则：
+import requests
+import json
+import time
+ 
+# 模拟请求头，合规抓取公开数据
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "Referer": "https://www.tiktok.com/"
+}
+ 
+# 批量获取创作者公开核心数据
+def get_creator_info(uid_list):
+    creator_resource = []
+    for uid in uid_list:
+        try:
+            # 调用公开数据接口
+            url = f"https://www.tiktok.com/api/user/detail/?uniqueId={uid}"
+            res = requests.get(url, headers=HEADERS, timeout=10)
+            data = json.loads(res.text)
+            
+            if data.get("userInfo"):
+                user = data["userInfo"]
+                # 筛选核心运营数据
+                info = {
+                    "账号ID": uid,
+                    "昵称": user["user"]["nickname"],
+                    "粉丝数": user["stats"]["followerCount"],
+                    "作品数": user["stats"]["videoCount"],
+                    "平均点赞": user["stats"].get("heartCount", 0),
+                    "内容垂类": user.get("category", "未知")
+                }
+                creator_resource.append(info)
+            time.sleep(1.2) # 节流防风控
+        except Exception as e:
+            print(f"账号{uid}数据获取失败：{str(e)}")
+            continue
+    return creator_resource
+ 
+# 批量导出资源列表
+if __name__ == "__main__":
+    # 填入需要批量查询的创作者ID
+    target_uid = ["demo1", "demo2", "demo3"]
+    res = get_creator_info(target_uid)
+    # 打印整理后的达人资源数据
+    for item in res:
+        print(json.dumps(item, ensure_ascii=False, indent=2))
+代码运行后，可快速批量整理出标准化的创作者资源列表，解决了以往资源零散、数据不准的问题。我们可以基于返回的数据，自定义筛选条件，优先筛选垂直领域、互动数据稳定、粉丝质量高的优质达人，精准适配跨境带货、品牌种草、内容合拍等不同合作场景。
+长期实测下来，这套轻量化方案 稳定性极强，数据更新及时，相比付费工具性价比更高。目前我已积累了海量垂直领域创作者资源，覆盖美妆、家居、数码、美食等主流赛道，且经过多轮数据筛选，过滤了数据注水、低活跃度账号，资源精准度极高。
+对于中小型跨境运营团队和个人从业者来说，优质且精准的创作者资源就是核心竞争力。无需盲目摸索筛选，借助成熟的整理方案和现成资源，能够大幅降低运营试错成本，快速推进海外内容合作与账号运营工作。有需要交流技术优化、资源整合经验的朋友，欢迎评论区留言探讨。@some1899
+达人详情示例：
+{
+    "common": {
+        "user_account_info": {
+            "account_type": 3,
+            "is_private_account": false
+        },
+        "user_profile_info": {
+            "avatar": {
+                "avatar_300x300": {
+                    "uri": "tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd",
+                    "url_list": [
+                        "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:300:300.webp?dr=9638\u0026refresh_token=1434642f\u0026x-expires=1777716000\u0026x-signature=Q6Trl4uXPKWFyImfMHXNnUHXJC0%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8",
+                        "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:300:300.webp?dr=9638\u0026refresh_token=b1fc3430\u0026x-expires=1777716000\u0026x-signature=vj740QkoT5Kln7tV34zxGGIm0vA%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8",
+                        "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:300:300.jpeg?dr=9638\u0026refresh_token=165a6053\u0026x-expires=1777716000\u0026x-signature=XYzr1K4sMKkj7Eer50E1cfUR8Zo%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8"
+                    ],
+                    "url_prefix": null
+                },
+                "avatar_larger": {
+                    "uri": "tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd",
+                    "url_list": [
+                        "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:1080:1080.webp?dr=9640\u0026refresh_token=ec07773a\u0026x-expires=1777716000\u0026x-signature=NDFncUiYvX1m3yJHIIbXf%2FUNPTU%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8",
+                        "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:1080:1080.webp?dr=9640\u0026refresh_token=93ba13e4\u0026x-expires=1777716000\u0026x-signature=UJLiTSmR6tthMYtkVLZD0%2F8TWgQ%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8",
+                        "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:1080:1080.jpeg?dr=9640\u0026refresh_token=6aaa26ae\u0026x-expires=1777716000\u0026x-signature=MowOBpoM6p2ChHriQT%2BYR%2B0LCr8%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8"
+                    ],
+                    "url_prefix": null
+                },
+                "avatar_medium": {
+                    "uri": "tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd",
+                    "url_list": [
+                        "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:720:720.webp?dr=9640\u0026refresh_token=5bd81a90\u0026x-expires=1777716000\u0026x-signature=rKX%2BwyiDrh59NfGzwpditL2Mz5s%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8",
+                        "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:720:720.webp?dr=9640\u0026refresh_token=2ed36f2d\u0026x-expires=1777716000\u0026x-signature=0CfK32%2FawMVpNHfZLEZovdIu6fY%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8",
+                        "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:720:720.jpeg?dr=9640\u0026refresh_token=15c6c62f\u0026x-expires=1777716000\u0026x-signature=JLuHEPrl4n7nzyHWbJH3p%2FavnQQ%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8"
+                    ],
+                    "url_prefix": null
+                },
+                "avatar_meta_info_list": [
+                    {
+                        "avatar_category": 1,
+                        "avatar_meta_info": {
+                            "avatar_source": 1
+                        }
+                    },
+                    {
+                        "avatar_category": 6,
+                        "avatar_meta_info": {}
+                    }
+                ],
+                "avatar_thumb": {
+                    "uri": "tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd",
+                    "url_list": [
+                        "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:100:100.webp?dr=9640\u0026refresh_token=0ff6cacb\u0026x-expires=1777716000\u0026x-signature=d05ZVdVuc7U2yxA7XWe2O%2Fu%2FpWA%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8",
+                        "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:100:100.webp?dr=9640\u0026refresh_token=31ae1973\u0026x-expires=1777716000\u0026x-signature=SXs6vXy06UJVjZ1fNaOhnzHRbjc%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8",
+                        "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:100:100.jpeg?dr=9640\u0026refresh_token=9f33df20\u0026x-expires=1777716000\u0026x-signature=m7bAU4Z5EmXEE1SoGCbZz1g4xng%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8"
+                    ],
+                    "url_prefix": null
+                },
+                "static_avatar": {
+                    "avatar_300x300": {
+                        "uri": "tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd",
+                        "url_list": [
+                            "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:300:300.webp?dr=9638\u0026refresh_token=a64ffa04\u0026x-expires=1777564800\u0026x-signature=7anotKaiEsy5ctK7Y1THO27kCoQ%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=2472a6c6\u0026shcp=9b759fb9\u0026idc=useast8",
+                            "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:300:300.webp?dr=9638\u0026refresh_token=ee21e084\u0026x-expires=1777564800\u0026x-signature=e9Vu9AQUsI%2BhxSOG%2FXxNVUBLBZ4%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=2472a6c6\u0026shcp=9b759fb9\u0026idc=useast8",
+                            "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:300:300.jpeg?dr=9638\u0026refresh_token=6f27579e\u0026x-expires=1777564800\u0026x-signature=M3Rxv%2B6IwRpbpJD1GKvcpJw%2BjmQ%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=2472a6c6\u0026shcp=9b759fb9\u0026idc=useast8"
+                        ],
+                        "url_prefix": null
+                    },
+                    "avatar_larger": {
+                        "uri": "tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd",
+                        "url_list": [
+                            "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-origin.image?dr=9643\u0026refresh_token=43fbbfbe\u0026x-expires=1777716000\u0026x-signature=XoLc%2FymjOCuM2O0DgVMaoipomCE%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8",
+                            "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-origin.image?dr=9643\u0026refresh_token=dd4c5ea8\u0026x-expires=1777716000\u0026x-signature=cH4%2B6Y2jNJIKSf2kkq%2BW8IMOMQc%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8",
+                            "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-origin.jpeg?dr=9643\u0026refresh_token=a40c2fa5\u0026x-expires=1777716000\u0026x-signature=dQb5GYI%2Fdmqy9Y7%2F7W4lt1WnT%2F4%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=2472a6c6\u0026idc=useast8"
+                        ],
+                        "url_prefix": null
+                    },
+                    "avatar_medium": {
+                        "uri": "tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd",
+                        "url_list": [
+                            "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:720:720.webp?dr=9640\u0026refresh_token=f5c41c60\u0026x-expires=1777564800\u0026x-signature=k6ducp%2FOqrHgrMceC3DInOmX1nY%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=2472a6c6\u0026shcp=9b759fb9\u0026idc=useast8",
+                            "https://p19-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:720:720.webp?dr=9640\u0026refresh_token=ea21521e\u0026x-expires=1777564800\u0026x-signature=RMqyEL9AHHt2Zz%2FckyFWNE0AC38%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=2472a6c6\u0026shcp=9b759fb9\u0026idc=useast8",
+                            "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/68317909685a54852d9897d6447ad7dd~tplv-tiktokx-cropcenter:720:720.jpeg?dr=9640\u0026refresh_token=c9ef2b27\u0026x-expires=1777564800\u0026x-signature=Nv1yYYQJnD2SZKW%2FsQGSGsBM%2F78%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=2472a6c6\u0026shcp=9b759fb9\u0026idc=useast8"
+                        ],
+                        "url_prefix": null
+                    }
+                }
+            },
+            "nickname": "Sanatsparkle",
+            "sec_uid": "MS4wLjABAAAAbxofZCNEFs9BPRTDwElh8odet78mfRUPBVwUNfkYQ7tc6BXuKoWS8aZ-XP0HlOoh",
+            "uid": "7356434712338056238",
+            "username": "sanatjewelstreasures"
+        },
+        "user_relation_info": {
+            "follow_status": 0,
+            "follower_status": 0,
+            "is_blocked": false,
+            "is_blocking": false
+        },
+        "user_statics_info": {
+            "aweme_count": 1193,
+            "visible_videos_count": 1193
+        }
+    },
+    "extra": {
+        "fatal_item_ids": [],
+        "logid": "202604301036595016BEF770933B02F954",
+        "now": 1777545419000
+    },
